@@ -347,9 +347,9 @@ def main():
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
             emys.add(Enemy())
             
-        if (event.type == pg.KEYDOWN and event.key == pg.K_RETURN) and score.value >= 200:
-            score.value -= 200
-            gravity.add(Gravity(400))
+        if (event.type == pg.KEYDOWN and event.key == pg.K_RETURN) and len(gravity) == 0 and score.value >= 200:
+                score.value -= 200
+                gravity.add(Gravity(400))
 
         for emy in emys:
 
