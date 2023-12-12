@@ -234,7 +234,7 @@ class Score:
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
-        self.value = 0
+        self.value = 30
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
@@ -243,6 +243,32 @@ class Score:
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         screen.blit(self.image, self.rect)
 
+
+class EMP(pg.sprite.Sprite):
+    """
+    発動時に存在する敵機と爆弾を無効化するクラス
+    """
+    def __init__(self, emys, bombs, screen):
+        super().__init__()
+        self.emys = emys
+        self.bombs = bombs
+        self.screeen = screen
+
+    def update(self):
+        self.emys.interval = float('inf')
+        for i in self.emys:
+            i.image = pg.transform.laplacian(i.image)
+            i.image.set_colorkey((0, 0, 0))
+        for j in self.bombs:
+            j.speed = j.speed / 2
+
+        self.image = pg.Surface((1600, 900))
+        pg.draw.rect(self.image, (255, 255, 0), (0, 0, 1600, 900))
+        self.image.set_alpha(128)
+        self.rect = self.image.get_rect()
+        time.sleep(0.05)
+        self.image.set_alpha(0)
+        self.rect = self.image.get_rect()
 
 def main():
     pg.display.set_caption("真！こうかとん無双")
@@ -255,6 +281,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    emp = EMP(emys, bombs, screen)
 
     tmr = 0
     clock = pg.time.Clock()
@@ -265,6 +292,8 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if (event.type == pg.KEYDOWN and event.key == pg.K_e) and score.value >= 20:
+                emp.update()
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
