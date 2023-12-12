@@ -234,7 +234,7 @@ class Score():
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
-        self.value = 0
+        self.value = 200
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
@@ -292,9 +292,9 @@ def main():
         if key_lst[pg.K_r] and score.value >= 200:
             score.value -= 200
             gravity.add(Gravity(400))
-            gravity.update()
 
         for emy in emys:
+
             if emy.state == "stop" and tmr%emy.interval == 0:
                 # 敵機が停止状態に入ったら，intervalに応じて爆弾投下
                 bombs.add(Bomb(emy, bird))
@@ -319,12 +319,13 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.value += 1  # 1点アップ
         
-        for emy in pg.sprite.groupcollide(emys, gravity, True, True).keys():
+        for emy in pg.sprite.groupcollide(emys, gravity, True, False).keys():
             exps.add(Explosion(emy, 100))  # 爆発エフェクト
             score.value += 10  # 10点アップ
             bird.change_img(6, screen)  # こうかとん喜びエフェクト
             
-        
+        gravity.update()
+        gravity.draw(screen)
         bird.update(key_lst, screen)
         beams.update()
         beams.draw(screen)
