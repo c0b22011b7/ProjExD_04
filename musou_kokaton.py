@@ -6,8 +6,8 @@ import time
 import pygame as pg
 
 
-WIDTH = 1250  # ゲームウィンドウの幅
-HEIGHT = 650  # ゲームウィンドウの高さ
+WIDTH = 1600  # ゲームウィンドウの幅
+HEIGHT = 900  # ゲームウィンドウの高さ
 MAIN_DIR = os.path.split(os.path.abspath(__file__))[0]
 
 
@@ -237,9 +237,6 @@ class Enemy(pg.sprite.Sprite):
         self.rect.centery += self.vy
 
 
-
-class Score():
-
 class Shield(pg.sprite.Sprite):
     """
     防御壁に関するクラス
@@ -283,7 +280,7 @@ class Score:
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
-        self.value = 200
+        self.value = 0
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
@@ -350,7 +347,7 @@ def main():
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
             emys.add(Enemy())
             
-        if key_lst[pg.K_r] and score.value >= 200:
+        if (event.type == pg.KEYDOWN and event.key == pg.K_RETURN) and score.value >= 200:
             score.value -= 200
             gravity.add(Gravity(400))
 
