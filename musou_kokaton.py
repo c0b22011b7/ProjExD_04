@@ -225,7 +225,7 @@ class Enemy(pg.sprite.Sprite):
         self.rect.centery += self.vy
 
 
-class Score:
+class Score():
     """
     打ち落とした爆弾，敵機の数をスコアとして表示するクラス
     爆弾：1点
@@ -244,6 +244,23 @@ class Score:
         screen.blit(self.image, self.rect)
 
 
+class Gravity(pg.sprite.Sprite):
+    def __init__(self,life:int):
+        
+        super().__init__()
+        
+        self.image = pg.Surface((1600,900))
+        pg.draw.rect(self.image,(0, 0, 0), (0, 0, 1600, 900))
+        self.image.set_alpha(128)
+        self.rect = self.image.get_rect()
+        self.life = life
+        
+    def update(self):
+        self.life -= 1
+        if self.life < 0:
+            self.kill()
+        
+
 def main():
     pg.display.set_caption("真！こうかとん無双")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -255,6 +272,8 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+
+    gravity = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
@@ -269,6 +288,11 @@ def main():
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
             emys.add(Enemy())
+            
+        if key_lst[pg.K_r] and score.value >= 200:
+            score.value -= 200
+            gravity.add(Gravity(400))
+            gravity.update()
 
         for emy in emys:
             if emy.state == "stop" and tmr%emy.interval == 0:
@@ -291,6 +315,16 @@ def main():
             time.sleep(2)
             return
 
+        for bomb in pg.sprite.groupcollide(bombs, gravity,True, False).keys():
+            exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+            score.value += 1  # 1点アップ
+        
+        for emy in pg.sprite.groupcollide(emys, gravity, True, True).keys():
+            exps.add(Explosion(emy, 100))  # 爆発エフェクト
+            score.value += 10  # 10点アップ
+            bird.change_img(6, screen)  # こうかとん喜びエフェクト
+            
+        
         bird.update(key_lst, screen)
         beams.update()
         beams.draw(screen)
